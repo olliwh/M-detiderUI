@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Team Status Board</title>
+    <style>
+        
+ /* Base styles */
+ * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background-color: #f9fafb;
+    color: #1f2937;
+    padding: 2rem 1rem;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Header styles */
+.header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.header h1 {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+}
+
+.header p {
+    color: #6b7280;
+    font-size: 1.1rem;
+}
+
+/* Controls section */
+.controls {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+@media (min-width: 768px) {
+    .controls {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap; /* 🆕 Allow wrapping */
+        gap: 1rem; /* 🆕 Add spacing when wrapping */
+    }
+}
+
+/* Search box */
+.search-box {
+    position: relative;
+    max-width: 400px;
+    width: 100%;
+}
+
+.search-box input {
+    width: 100%;
+    padding: 0.75rem 1rem 0.75rem 2.5rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.375rem;
+    font-size: 0.95rem;
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.search-box input:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
+}
+
+.search-box::before {
+    content: '🔍';
+    position: absolute;
+    left: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #9ca3af;
+}
+
+/* Filter buttons */
+.filter-buttons {
+    display: flex;
+    gap: 0.5rem;
+    overflow-x: auto;
+    padding-bottom: 0.25rem;
+}
+
+.filter-button {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: 9999px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    border: 1px solid #d1d5db;
+    background-color: white;
+    color: #4b5563;
+    white-space: nowrap;
+    transition: all 0.2s;
+}
+
+.filter-button:hover {
+    background-color: #f3f4f6;
+}
+
+.filter-button.active {
+    background-color: #dbeafe;
+    color: #1e40af;
+    border: 2px solid #3b82f6;
+}
+
+/* Status colors - centralized */
+:root {
+    --color-office-bg: #d1fae5;
+    --color-office-text: #065f46;
+    --color-office-dot: #10b981;
+    --color-home-bg: #dbeafe;
+    --color-home-text: #1e40af;
+    --color-home-dot: #3b82f6;
+    --color-sick-bg: #fee2e2;
+    --color-sick-text: #991b1b;
+    --color-sick-dot: #ef4444;
+    --color-default-bg: #e5e7eb;
+    --color-default-text: #4b5563;
+}
+
+/* Counter badges */
+.counter {
+    border-radius: 9999px;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.filter-button[data-status="all"] .counter {
+    background-color: var(--color-default-bg);
+    color: var(--color-default-text);
+}
+
+.filter-button[data-status="office"] .counter {
+    background-color: var(--color-office-bg);
+    color: var(--color-office-text);
+}
+
+.filter-button[data-status="home"] .counter {
+    background-color: var(--color-home-bg);
+    color: var(--color-home-text);
+}
+
+.filter-button[data-status="sick"] .counter {
+    background-color: var(--color-sick-bg);
+    color: var(--color-sick-text);
+}
+
+/* Employee grid */
+.employees-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1.5rem;
+}
+
+/* Employee cards */
+.employee-card {
+    background-color: white;
+    border-radius: 0.5rem;
+    border: 1px solid #e5e7eb;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.2s;
+}
+
+.employee-card:hover {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.employee-content {
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.photo-container {
+    position: relative;
+    margin-bottom: 1rem;
+}
+
+.employee-photo {
+    width: 96px;
+    height: 96px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #e5e7eb;
+}
+
+.birthday-flag {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 24px;
+    height: 24px;
+    border-radius: 4px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Add a cake icon or decoration to the flag */
+.birthday-flag::after {
+    content: "🎂";
+    font-size: 28px;
+}
+
+/* Status indicators */
+.status-dot {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: 2px solid white;
+}
+
+.status-dot.office { background-color: var(--color-office-dot); }
+.status-dot.home { background-color: var(--color-home-dot); }
+.status-dot.sick { background-color: var(--color-sick-dot); }
+
+.employee-name {
+    font-size: 1.125rem;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    text-align: center;
+}
+
+.status-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.status-badge.office {
+    background-color: var(--color-office-bg);
+    color: var(--color-office-text);
+}
+
+.status-badge.home {
+    background-color: var(--color-home-bg);
+    color: var(--color-home-text);
+}
+
+.status-badge.sick {
+    background-color: var(--color-sick-bg);
+    color: var(--color-sick-text);
+}
+
+/* No results message */
+.no-results {
+    text-align: center;
+    padding: 3rem;
+    background-color: white;
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    color: #6b7280;
+    font-size: 1.125rem;
+    margin-top: 3rem;
+}
+
+
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Team Status Board</h1>
+            <p>Hvem arbejder hvor</p>
+        </div>
+
+        <div class="controls">
+            <div class="search-box">
+                <input type="text" id="search-input" placeholder="Search by name...">
+            </div>
+
+            <div class="filter-buttons">
+                <button class="filter-button active" data-status="all">
+                    Alle <span class="counter" id="count-all">0</span>
+                </button>
+                <button class="filter-button" data-status="office">
+                    Kontor <span class="counter" id="count-office">0</span>
+                </button>
+                <button class="filter-button" data-status="home">
+                    Hjemme <span class="counter" id="count-home">0</span>
+                </button>
+                <button class="filter-button" data-status="sick">
+                    Syg <span class="counter" id="count-sick">0</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="employees-grid" id="employees-grid">
+        </div>
+
+        <div class="no-results" id="no-results" style="display: none;">
+            Ingen resultater
+        </div>
+    </div>
+    <script src="js/config.js"></script>
+    <script>
+        const baseUrl = CONFIG.apiUrl;
+        const token = CONFIG.apiToken;
+        //1 min
+        // setInterval(fetchEmployeeData, 60000);
+        //15 min
+        setInterval(fetchEmployeeData, 900000);
+
+
+        const STATUS = {
+            OFFICE: 'office',
+            HOME: 'home',
+            SICK: 'sick',
+            UNKNOWN: 'unknown'
+        };
+
+        const COLOR_TO_STATUS = {
+            '#28de3d': STATUS.OFFICE,
+            '#3026de': STATUS.HOME,
+            '#ee1f41': STATUS.SICK
+        };
+
+        const STATUS_TEXT = {
+            [STATUS.OFFICE]: 'Kontor',
+            [STATUS.HOME]: 'Arbejder Hjemme',
+            [STATUS.SICK]: 'Syg',
+            [STATUS.UNKNOWN]: 'Ukendt'
+        };
+
+        // DOM elements
+        const employeesGrid = document.getElementById('employees-grid');
+        const searchInput = document.getElementById('search-input');
+        const filterButtons = document.querySelectorAll('.filter-button');
+        const noResults = document.getElementById('no-results');
+
+        //Status counters
+        const countAll = document.getElementById('count-all');
+        const countOffice = document.getElementById('count-office');
+        const countHome = document.getElementById('count-home');
+        const countSick = document.getElementById('count-sick');
+
+        //Current filter state
+        let currentFilter = 'all';
+        let searchQuery = '';
+        let employees = [];
+
+        //get data from API
+        async function getDataFromAPI(url, token) {
+            try {
+                const headers = {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                };
+
+                const response = await fetch(url, {
+                    method: 'GET',
+                    headers: headers
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+
+                const data = await response.json().catch(() => { throw new Error('Invalid JSON') });
+
+                console.log('Data fetched:', data);
+                return data;
+            } catch (error) {
+                console.error('Error fetching data:', error);
+                throw error;
+            }
+        }
+
+        // Fetch calendar data and transform it into employee data
+        async function fetchEmployeeData() {
+            const currentDate = getCurrentDateString();
+            const url = `${baseUrl}/api/v1/customapi/calendarbydate?date=${currentDate}`;
+            console.log(url);
+
+            try {
+                const data = await getDataFromAPI(url, token);
+
+                // Check if data is an array directly (as your console shows)
+                if (Array.isArray(data)) {
+                    if (data.length === 0) {
+                        console.warn('No employee data found for today');
+                        employeesGrid.innerHTML = '<div class="error-message">No employee data available for today.</div>';
+                        return;
+                    }
+
+                    // Transform array data directly into employee data format
+                    employees = data.map(entry => {
+                        const status = getStatusFromColor(entry.color);
+                        const DEFAULT_PHOTO = "/api/placeholder/100/100";
+                        return {
+                            id: entry.created_by.id,
+                            name: entry.created_by.firstname || entry.created_by.display_name || "Intet navn",
+                            birthday: entry.created_by.birthday,
+                            status: status,
+                            photo: entry.created_by.image_url || DEFAULT_PHOTO,
+                            startTime: entry.start_datetime,
+                            endTime: entry.end_datetime,
+                            title: entry.title
+                        };
+                    }).filter(employee => employee.status !== STATUS.UNKNOWN);
+                }
+                //Handle the original expected structure(as you get it from rest module)
+                else if (data.results) {
+                    console.log(`Total records reported: ${data.total}, Records received: ${data.results.length}`);
+
+                    if (data.results.length === 0) {
+                        console.warn('No employee data found for today');
+                        employeesGrid.innerHTML = '<div class="error-message">No employee data available for today.</div>';
+                        return;
+                    }
+
+                    // Transform API results into employee data format
+                    employees = data.results.map(entry => {
+                        const status = getStatusFromColor(entry.color);
+                        const DEFAULT_PHOTO = "/api/placeholder/100/100";
+                        return {
+                            id: entry.created_by.id,
+                            name: entry.created_by.firstname || entry.created_by.display_name || "Intet navn",
+                            birthday: entry.created_by.birthday,
+                            status: status,
+                            photo: entry.created_by.image_url || DEFAULT_PHOTO,
+                            startTime: entry.start_datetime,
+                            endTime: entry.end_datetime,
+                            title: entry.title
+                        };
+                    }).filter(employee => employee.status !== STATUS.UNKNOWN);
+                }
+                // Handle unexpected data structure
+                else {
+                    throw new Error('Unexpected API response format');
+                }
+
+                // Update UI
+                updateCounters();
+                renderEmployees();
+            } catch (error) {
+                console.error('Error fetching employee data:', error);
+                employeesGrid.innerHTML = `<div class="error-message">Failed to load employee data: ${error.message}</div>`;
+            }
+        }
+
+        // Get current date in YYYY-MM-DD format
+        function getCurrentDateString() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        // Convert color to status
+        function getStatusFromColor(color) {
+            return COLOR_TO_STATUS[color] || STATUS.UNKNOWN;
+        }
+
+        // Initialize counters
+        function updateCounters() {
+            countAll.textContent = employees.length;
+            countOffice.textContent = employees.filter(e => e.status === STATUS.OFFICE).length;
+            countHome.textContent = employees.filter(e => e.status === STATUS.HOME).length;
+            countSick.textContent = employees.filter(e => e.status === STATUS.SICK).length;
+        }
+
+        // Create employee card HTML
+        function createEmployeeCard(employee) {
+            const imageSrc = employee.photo || '/api/placeholder/100/100'
+            let hasBirtday = employee.birthday === getCurrentDateString();
+            console.log(employee.birthday + 'ii ' + hasBirtday)
+            const birthdayFlag = hasBirtday ?
+                `<div class="birthday-flag"></div>` : '';
+
+            return `
+        <div class="employee-card">
+            <div class="employee-content">
+                <div class="photo-container">
+                    <img src="${imageSrc}" alt="${employee.name}" class="employee-photo">
+                    <div class="status-dot ${employee.status}"></div>
+                    ${birthdayFlag}
+                </div>
+                <h3 class="employee-name">${employee.name}</h3>
+                <span class="status-badge ${employee.status}">${STATUS_TEXT[employee.status]}</span>
+            </div>
+        </div>
+    `;
+        }
+
+        // Filter and render employees
+        function renderEmployees() {
+            const filtered = employees.filter(employee => {
+                const matchesSearch = employee.name.toLowerCase().includes(searchQuery.toLowerCase());
+                const matchesFilter = currentFilter === 'all' || employee.status === currentFilter;
+
+                return matchesSearch && matchesFilter;
+            });
+
+            employeesGrid.innerHTML = filtered.map(createEmployeeCard).join('');
+
+            // Show/hide no results message
+            noResults.style.display = filtered.length === 0 ? 'block' : 'none';
+        }
+
+        // Initialize page
+        function init() {
+            // Set up event listeners
+            searchInput.addEventListener('input', (e) => {
+                searchQuery = e.target.value;
+                renderEmployees();
+            });
+
+            filterButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    // Update active button
+                    filterButtons.forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+
+                    // Update filter and re-render
+                    currentFilter = button.dataset.status;
+                    renderEmployees();
+                });
+            });
+
+            // Fetch employee data from API
+            fetchEmployeeData();
+        }
+
+        // Start the app
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+
+</body>
+
+</html>

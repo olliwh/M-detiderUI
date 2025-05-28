@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Team Status Board</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Team Status Board</h1>
+            <p>Hvem arbejder hvor</p>
+        </div>
+
+        <div class="controls">
+            <div class="search-box">
+                <input type="text" id="search-input" placeholder="Search by name...">
+            </div>
+
+            <div class="filter-buttons">
+                <button class="filter-button active" data-status="all">
+                    Alle <span class="counter" id="count-all">0</span>
+                </button>
+                <button class="filter-button" data-status="office">
+                    Kontor <span class="counter" id="count-office">0</span>
+                </button>
+                <button class="filter-button" data-status="home">
+                    Hjemme <span class="counter" id="count-home">0</span>
+                </button>
+                <button class="filter-button" data-status="sick">
+                    Syg <span class="counter" id="count-sick">0</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="employees-grid" id="employees-grid">
+        </div>
+
+        <div class="no-results" id="no-results" style="display: none;">
+            Ingen resultater
+        </div>
+    </div>
+    <script type="module" src="js/calendarEntry.js"></script>
+    <script type="module" src="js/employeeController.js"></script>
+    <script type="module" src="js/employeeModel.js"></script>
+    <script type="module" src="js/employeeView.js"></script>
+    <script src="js/config.js"></script>
+
+</body>
+</html>
