@@ -52,7 +52,7 @@ class EmployeeModel {
     async fetchEmployees() {
         try {
             const currentDate = this.getCurrentDateString();
-            const url = `${CONFIG.apiUrl}/api/v1/customapi/calendarbydate?date=${currentDate}`;
+            const url = `${CONFIG.apiUrl}calendarbydate?date=${currentDate}`;
             console.log(url);
 
             const data = await this.fetchData(url, CONFIG.apiToken);

@@ -399,7 +399,7 @@ body {
         // Fetch calendar data and transform it into employee data
         async function fetchEmployeeData() {
             const currentDate = getCurrentDateString();
-            const url = `${baseUrl}/api/v1/customapi/calendarbydate?date=${currentDate}`;
+            const url = `${baseUrl}calendarbydate?date=${currentDate}`;
             console.log(url);
 
             try {
