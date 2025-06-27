@@ -128,6 +128,9 @@ body {
     --color-sick-bg: #fee2e2;
     --color-sick-text: #991b1b;
     --color-sick-dot: #ef4444;
+    --color-holiday-bg: #fef3c7;
+    --color-holiday-text: #92400e;
+    --color-holiday-dot: #f59e0b;
     --color-default-bg: #e5e7eb;
     --color-default-text: #4b5563;
 }
@@ -158,6 +161,10 @@ body {
 .filter-button[data-status="sick"] .counter {
     background-color: var(--color-sick-bg);
     color: var(--color-sick-text);
+}
+.filter-button[data-status="holiday"] .counter {
+    background-color: var(--color-holiday-bg);
+    color: var(--color-holiday-text);
 }
 
 /* Employee grid */
@@ -233,6 +240,7 @@ body {
 .status-dot.office { background-color: var(--color-office-dot); }
 .status-dot.home { background-color: var(--color-home-dot); }
 .status-dot.sick { background-color: var(--color-sick-dot); }
+.status-dot.holiday { background-color: var(--color-holiday-dot); }
 
 .employee-name {
     font-size: 1.125rem;
@@ -261,6 +269,11 @@ body {
 .status-badge.sick {
     background-color: var(--color-sick-bg);
     color: var(--color-sick-text);
+}
+
+.status-badge.holiday {
+    background-color: var(--color-holiday-bg);
+    color: var(--color-holiday-text);
 }
 
 /* No results message */

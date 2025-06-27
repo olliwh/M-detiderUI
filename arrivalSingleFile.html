@@ -136,6 +136,9 @@ body {
     --color-sick-bg: #fee2e2;
     --color-sick-text: #991b1b;
     --color-sick-dot: #ef4444;
+    --color-holiday-bg: #fef3c7;
+    --color-holiday-text: #92400e;
+    --color-holiday-dot: #f59e0b;
     --color-default-bg: #e5e7eb;
     --color-default-text: #4b5563;
 }
@@ -166,6 +169,10 @@ body {
 .filter-button[data-status="sick"] .counter {
     background-color: var(--color-sick-bg);
     color: var(--color-sick-text);
+}
+.filter-button[data-status="holiday"] .counter {
+    background-color: var(--color-holiday-bg);
+    color: var(--color-holiday-text);
 }
 
 /* Employee grid */
@@ -241,6 +248,7 @@ body {
 .status-dot.office { background-color: var(--color-office-dot); }
 .status-dot.home { background-color: var(--color-home-dot); }
 .status-dot.sick { background-color: var(--color-sick-dot); }
+.status-dot.holiday { background-color: var(--color-holiday-dot); }
 
 .employee-name {
     font-size: 1.125rem;
@@ -269,6 +277,11 @@ body {
 .status-badge.sick {
     background-color: var(--color-sick-bg);
     color: var(--color-sick-text);
+}
+
+.status-badge.holiday {
+    background-color: var(--color-holiday-bg);
+    color: var(--color-holiday-text);
 }
 
 /* No results message */
@@ -312,6 +325,9 @@ body {
                 <button class="filter-button" data-status="sick">
                     Syg <span class="counter" id="count-sick">0</span>
                 </button>
+                <button class="filter-button" data-status="holiday">
+                    Ferie <span class="counter" id="count-holiday">0</span>
+                </button>
             </div>
         </div>
 
@@ -336,19 +352,22 @@ body {
             OFFICE: 'office',
             HOME: 'home',
             SICK: 'sick',
+            HOLIDAY: 'holiday',
             UNKNOWN: 'unknown'
         };
 
         const COLOR_TO_STATUS = {
             '#28de3d': STATUS.OFFICE,
             '#3026de': STATUS.HOME,
-            '#ee1f41': STATUS.SICK
+            '#ee1f41': STATUS.SICK,
+            '#efb145': STATUS.HOLIDAY
         };
 
         const STATUS_TEXT = {
             [STATUS.OFFICE]: 'Kontor',
             [STATUS.HOME]: 'Arbejder Hjemme',
             [STATUS.SICK]: 'Syg',
+            [STATUS.HOLIDAY]: 'Ferie',
             [STATUS.UNKNOWN]: 'Ukendt'
         };
 
@@ -363,6 +382,7 @@ body {
         const countOffice = document.getElementById('count-office');
         const countHome = document.getElementById('count-home');
         const countSick = document.getElementById('count-sick');
+        const countHoliday = document.getElementById('count-holiday');
 
         //Current filter state
         let currentFilter = 'all';
@@ -400,12 +420,10 @@ body {
         async function fetchEmployeeData() {
             const currentDate = getCurrentDateString();
             const url = `${baseUrl}calendarbydate?date=${currentDate}`;
-            console.log(url);
 
             try {
                 const data = await getDataFromAPI(url, token);
 
-                // Check if data is an array directly (as your console shows)
                 if (Array.isArray(data)) {
                     if (data.length === 0) {
                         console.warn('No employee data found for today');
@@ -429,33 +447,6 @@ body {
                         };
                     }).filter(employee => employee.status !== STATUS.UNKNOWN);
                 }
-                //Handle the original expected structure(as you get it from rest module)
-                else if (data.results) {
-                    console.log(`Total records reported: ${data.total}, Records received: ${data.results.length}`);
-
-                    if (data.results.length === 0) {
-                        console.warn('No employee data found for today');
-                        employeesGrid.innerHTML = '<div class="error-message">No employee data available for today.</div>';
-                        return;
-                    }
-
-                    // Transform API results into employee data format
-                    employees = data.results.map(entry => {
-                        const status = getStatusFromColor(entry.color);
-                        const DEFAULT_PHOTO = "/api/placeholder/100/100";
-                        return {
-                            id: entry.created_by.id,
-                            name: entry.created_by.firstname || entry.created_by.display_name || "Intet navn",
-                            birthday: entry.created_by.birthday,
-                            status: status,
-                            photo: entry.created_by.image_url || DEFAULT_PHOTO,
-                            startTime: entry.start_datetime,
-                            endTime: entry.end_datetime,
-                            title: entry.title
-                        };
-                    }).filter(employee => employee.status !== STATUS.UNKNOWN);
-                }
-                // Handle unexpected data structure
                 else {
                     throw new Error('Unexpected API response format');
                 }
@@ -489,13 +480,13 @@ body {
             countOffice.textContent = employees.filter(e => e.status === STATUS.OFFICE).length;
             countHome.textContent = employees.filter(e => e.status === STATUS.HOME).length;
             countSick.textContent = employees.filter(e => e.status === STATUS.SICK).length;
+            countHoliday.textContent = employees.filter(e => e.status === STATUS.HOLIDAY).length;
         }
 
         // Create employee card HTML
         function createEmployeeCard(employee) {
             const imageSrc = employee.photo || '/api/placeholder/100/100'
             let hasBirtday = employee.birthday === getCurrentDateString();
-            console.log(employee.birthday + 'ii ' + hasBirtday)
             const birthdayFlag = hasBirtday ?
                 `<div class="birthday-flag"></div>` : '';
 

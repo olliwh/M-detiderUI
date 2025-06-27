@@ -12,6 +12,7 @@ class EmployeeView {
     this.countOffice = document.getElementById('count-office');
     this.countHome = document.getElementById('count-home');
     this.countSick = document.getElementById('count-sick');
+    this.countHoliday = document.getElementById('count-holiday');
   }
 
   createEmployeeCard(employee) {
@@ -46,6 +47,7 @@ class EmployeeView {
     this.countOffice.textContent = counts.office;
     this.countHome.textContent = counts.home;
     this.countSick.textContent = counts.sick;
+    this.countHoliday.textContent = counts.holiday;
   }
 
   showError(message) {

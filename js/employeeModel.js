@@ -110,7 +110,8 @@ class EmployeeModel {
             all: this.employees.length,
             office: this.employees.filter(e => e.status === STATUS.OFFICE).length,
             home: this.employees.filter(e => e.status === STATUS.HOME).length,
-            sick: this.employees.filter(e => e.status === STATUS.SICK).length
+            sick: this.employees.filter(e => e.status === STATUS.SICK).length,
+            holiday: this.employees.filter(e => e.status === STATUS.HOLIDAY).length
         };
     }
 }
