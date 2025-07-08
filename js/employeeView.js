@@ -1,5 +1,15 @@
 import {STATUS_TEXT } from './utils/statusUtils.js';
 
+        // Add this helper function to format time
+        function formatWorkTime(dateTimeString) {
+          const date = new Date(dateTimeString);
+          return date.toLocaleTimeString('en-US', {
+              hour: '2-digit',
+              minute: '2-digit',
+              hour12: false
+          });
+      }
+
 class EmployeeView {
   constructor() {
     this.employeesGrid = document.getElementById('employees-grid');
@@ -19,16 +29,31 @@ class EmployeeView {
     const birthdayFlag = employee.hasBirthday() ? 
       `<div class="birthday-flag"></div>` : '';
 
+    console.log(employee.status)
+    let isWorking =
+        employee.status == 'office' || employee.status == 'home';
+    const workTime = isWorking
+        ? `<div class="work-time">${formatWorkTime(
+              employee.startTime
+          )}-${formatWorkTime(employee.endTime)}</div>`
+        : "";
+
     return `
       <div class="employee-card">
         <div class="employee-content">
           <div class="photo-container">
-            <img src="${employee.photo}" alt="${employee.name}" class="employee-photo">
+            <img src="${employee.photo}" alt="${
+        employee.name
+    }" class="employee-photo">
             <div class="status-dot ${employee.status}"></div>
             ${birthdayFlag}
           </div>
           <h3 class="employee-name">${employee.name}</h3>
-          <span class="status-badge ${employee.status}">${STATUS_TEXT[employee.status]}</span>
+                        ${workTime}
+
+          <span class="status-badge ${employee.status}">${
+        STATUS_TEXT[employee.status]
+    }</span>
         </div>
       </div>
     `;
