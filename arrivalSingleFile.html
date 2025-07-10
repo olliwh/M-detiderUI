@@ -216,24 +216,6 @@ body {
     border: 2px solid #e5e7eb;
 }
 
-.birthday-flag {
-    position: absolute;
-    top: 0;
-    right: 0;
-    width: 24px;
-    height: 24px;
-    border-radius: 4px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-/* Add a cake icon or decoration to the flag */
-.birthday-flag::after {
-    content: "🎂";
-    font-size: 28px;
-}
-
 /* Status indicators */
 .status-dot {
     position: absolute;
@@ -290,6 +272,24 @@ body {
 .status-badge.holiday {
     background-color: var(--color-holiday-bg);
     color: var(--color-holiday-text);
+}
+
+.birthday-flag {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 24px;
+    height: 24px;
+    border-radius: 4px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Add a cake icon or decoration to the flag */
+.birthday-flag::after {
+    content: "🎂";
+    font-size: 28px;
 }
 
 /* No results message */
@@ -424,7 +424,7 @@ body {
             }
         }
 
-        // Add this helper function to format time
+        //helper function to format work time
         function formatWorkTime(dateTimeString) {
             const date = new Date(dateTimeString);
             return date.toLocaleTimeString('en-US', {
